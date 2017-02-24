@@ -29,6 +29,10 @@
 
 ]).
 
+-define(SEC_PER_DAY, 86400).
+-define(SEC_PER_HOUR, 3600).
+-define(SEC_PER_MIN, 60).
+
 %%%===================================================================
 %%% Types
 %%%===================================================================
@@ -200,6 +204,23 @@ diff(DT1, DT2) when is_binary(DT1), is_binary(DT2) ->
   do_diff(DT1, DT2).
 
 %%--------------------------------------------------------
+diff_test() ->
+  ?assertEqual(0, diff(<<"20170101">>, <<"20170101">>)),
+  ?assertEqual(?SEC_PER_DAY, diff(<<"20170101">>, <<"20170102">>)),
+
+  ?assertEqual(0, diff(<<"20170101101010">>, <<"20170101101010">>)),
+  ?assertEqual(?SEC_PER_DAY, diff(<<"20170101101010">>, <<"20170102101010">>)),
+  ?assertEqual(?SEC_PER_DAY + 1, diff(<<"20170101101010">>, <<"20170102101011">>)),
+
+  ?assertEqual(0, diff(<<"170101101010">>, <<"170101101010">>)),
+  ?assertEqual(?SEC_PER_DAY, diff(<<"170101101010">>, <<"170102101010">>)),
+  ?assertEqual(?SEC_PER_DAY + 1, diff(<<"170101101010">>, <<"170102101011">>)),
+
+  ?assertEqual(0, diff(<<"101010">>, <<"101010">>)),
+  ?assertEqual(?SEC_PER_HOUR, diff(<<"101010">>, <<"111010">>)),
+  ?assertEqual(?SEC_PER_HOUR+10, diff(<<"101010">>, <<"111020">>)),
+  ok.
+%%--------------------------------------------------------
 do_diff(DT1, DT2) when byte_size(DT1) =:= 8 ->
   %% YYYYMMDD format
   diff_yyyymmdd(DT1, DT2);
@@ -214,7 +235,6 @@ do_diff(DT1, DT2) when byte_size(DT1) =:= 6 + 6 ->
   diff_yymmddhhmmss(DT1, DT2).
 
 %%--------------------------------------------------------
--define(SEC_PER_DAY, 86400).
 
 diff_yyyymmdd(DT1, DT2) when byte_size(DT1) =:= 8 ->
   Days1 = yyyymmdd_2_days(DT1),
@@ -302,10 +322,6 @@ calc_diff_in_secs_test() ->
   ?assertEqual(-86400 + 1, calc_diff_in_secs({-1, {0, 0, 1}})),
   ok.
 
-%%--------------------------------------------------------
-diff_test() ->
-  ?assertEqual(0, diff(<<"20170101">>, <<"20170101">>)),
-  ok.
 
 %%====================================================================
 %% Internal functions
