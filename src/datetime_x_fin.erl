@@ -57,19 +57,23 @@
 
 %%--------------------------------------------------------
 now() ->
-  now(local).
+  list_to_binary(now(local)).
 
 now(epoch) ->
-  erlang:system_time(milli_seconds);
+  list_to_binary(erlang:system_time(milli_seconds));
 now(local) ->
-  datetime_x:now_to_local_string(erlang:timestamp());
+  list_to_binary(datetime_x:now_to_local_string(erlang:timestamp()));
 now(utc) ->
-  datetime_x:now_to_utc_string(erlang:timestamp());
+  list_to_binary(datetime_x:now_to_utc_string(erlang:timestamp()));
 %% used for up txn req packet
 now(txn) ->
-  datetime_x:now_to_local_txn_string(erlang:timestamp());
+  list_to_binary(datetime_x:now_to_local_txn_string(erlang:timestamp()));
 now(ts) ->
-  datetime_x:now_to_local_ts_string(erlang:timestamp()).
+  list_to_binary(datetime_x:now_to_local_ts_string(erlang:timestamp())).
+
+now_test() ->
+  ?assertEqual(true, is_binary(now(txn))),
+  ok.
 
 %%--------------------------------------------------------
 -spec today() -> Date when
@@ -218,7 +222,7 @@ diff_test() ->
 
   ?assertEqual(0, diff(<<"101010">>, <<"101010">>)),
   ?assertEqual(?SEC_PER_HOUR, diff(<<"101010">>, <<"111010">>)),
-  ?assertEqual(?SEC_PER_HOUR+10, diff(<<"101010">>, <<"111020">>)),
+  ?assertEqual(?SEC_PER_HOUR + 10, diff(<<"101010">>, <<"111020">>)),
   ok.
 %%--------------------------------------------------------
 do_diff(DT1, DT2) when byte_size(DT1) =:= 8 ->
