@@ -57,7 +57,7 @@
 
 %%--------------------------------------------------------
 now() ->
-  list_to_binary(now(local)).
+  now(local).
 
 now(epoch) ->
   list_to_binary(erlang:system_time(milli_seconds));
