@@ -59,6 +59,8 @@
 now() ->
   now(local).
 
+now(utc) ->
+  list_to_binary(datetime_x:now_to_utc_string(erlang:timestamp()));
 now(epoch) ->
   list_to_binary(erlang:system_time(milli_seconds));
 now(local) ->
