@@ -27,12 +27,14 @@
   , day_atom/1
   , month_to_list/1
   , list_to_month/1
-
   , localtime/0
   , localtime_to_seconds/1
   , localtime_to_yyyymmdd/1
   , now_to_local_ts_string/1
   , now_to_local_txn_string/1
+  , yyyymmdd_to_tuple/1
+  , tuple_to_yyyymmdd/1
+
 
 ]).
 
@@ -261,3 +263,10 @@ list_to_month("Dec") -> 12.
 
 
 
+
+
+yyyymmdd_to_tuple(<<Year:4/bytes, Month:2/bytes, Day:2/bytes>>) ->
+  {binary_to_integer(Year),binary_to_integer(Month),binary_to_integer(Day)}.
+
+tuple_to_yyyymmdd({Year,Month,Day}) ->
+  list_to_binary(io_lib:format("~4..0w~2..0w~2..0w", [Year, Month, Day])).
