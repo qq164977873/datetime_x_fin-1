@@ -1,4 +1,5 @@
 language: erlang
+script: "./rebar3 eunit"
 otp_release:
   - 19.3
   - 18.3.1

@@ -346,24 +346,36 @@ calc_diff_in_secs_test() ->
 
 %%返回下一天
 nextday(Date) when byte_size(Date) =:= 8 ->
-  Days = calendar:date_to_gregorian_days(datetime_x:yyyymmdd_to_tuple(Date)),
-  datetime_x:tuple_to_yyyymmdd(calendar:gregorian_days_to_date(Days+1));
+  case calendar:valid_date(datetime_x:yyyymmdd_to_tuple(Date)) of
+      true ->
+        Days = calendar:date_to_gregorian_days(datetime_x:yyyymmdd_to_tuple(Date)),
+        datetime_x:tuple_to_yyyymmdd(calendar:gregorian_days_to_date(Days+1));
+      false->
+        errortime
+
+end;
 nextday(<<Month:2/bytes, Day:2/bytes>>) ->
   <<Year:4/bytes, _Rest/binary>> = today(),
-  Days = calendar:date_to_gregorian_days({binary_to_integer(Year),binary_to_integer(Month),binary_to_integer(Day)}),
-  {YYYY,MM,DD}=calendar:gregorian_days_to_date(Days+1),
-  list_to_binary(io_lib:format("~4..0w~2..0w~2..0w", [YYYY, MM, DD]))
-.
+  case calendar:valid_date({binary_to_integer(Year),binary_to_integer(Month),binary_to_integer(Day)}) of
+      true->
+        Days = calendar:date_to_gregorian_days({binary_to_integer(Year),binary_to_integer(Month),binary_to_integer(Day)}),
+        {_,MM,DD}=calendar:gregorian_days_to_date(Days+1),
+        list_to_binary(io_lib:format("~2..0w~2..0w", [MM, DD]));
+      false->
+        errortime
+end.
 %%nextday函数测试
 nextday_test()->
   ?assertEqual(<<"20170101">>,nextday(<<"20161231">>)), %% 年末 月末
-  ?assertEqual(<<"20180101">>,nextday(<<"1231">>)), %% 年末 月末
+  ?assertEqual(<<"0101">>,nextday(<<"1231">>)), %% 年末 月末
 
   ?assertEqual(<<"20170102">>,nextday(<<"20170101">>)), %% 元旦 月初
-  ?assertEqual(<<"20170102">>,nextday(<<"0101">>)), %% 元旦 月初
+  ?assertEqual(<<"0102">>,nextday(<<"0101">>)), %% 元旦 月初
 
   ?assertEqual(<<"20170301">>,nextday(<<"20170228">>)),  %% 闰月 月末
-  ?assertEqual(<<"20170301">>,nextday(<<"0228">>)),  %% 闰月 月末
+  ?assertEqual(<<"0301">>,nextday(<<"0228">>)),  %% 闰月 月末
+
+  ?assertEqual(errortime,nextday(<<"20170229">>)),  %% 闰月 29日
   ok
   .
 
@@ -375,14 +387,21 @@ nextday_test()->
   Date :: types:date_yyyymmdd().
 
 inc_days(Date , Days) when byte_size(Date) =:= 8  ->
-  Day = calendar:date_to_gregorian_days(datetime_x:yyyymmdd_to_tuple(Date)),
-  datetime_x:tuple_to_yyyymmdd(calendar:gregorian_days_to_date(Day+Days)).
+  case calendar:valid_date(datetime_x:yyyymmdd_to_tuple(Date)) of
+      true->
+        Day = calendar:date_to_gregorian_days(datetime_x:yyyymmdd_to_tuple(Date)),
+        datetime_x:tuple_to_yyyymmdd(calendar:gregorian_days_to_date(Day+Days));
+      false->
+        errortime
+  end.
 
 %%inc_day函数测试
 inc_days_test()->
   ?assertEqual(<<"20170131">>,inc_days(<<"20161231">>,31)), %% 年末 月末
   ?assertEqual(<<"20170106">>,inc_days(<<"20170101">>,5)), %% 元旦 月初
   ?assertEqual(<<"20170310">>,inc_days(<<"20170228">>,10)),  %% 闰月 月末
+  ?assertEqual(errortime,inc_days(<<"20170229">>,10)),  %% 闰月 29日
+
   ok
 .
 
@@ -394,13 +413,19 @@ inc_days_test()->
   Date :: types:date_yyyymmdd().
 
 dec_days(Date , Days) when byte_size(Date) =:= 8 ->
-  Day = calendar:date_to_gregorian_days(datetime_x:yyyymmdd_to_tuple(Date)),
-  datetime_x:tuple_to_yyyymmdd(calendar:gregorian_days_to_date(Day-Days)).
+  case calendar:valid_date(datetime_x:yyyymmdd_to_tuple(Date)) of
+      true->
+        Day = calendar:date_to_gregorian_days(datetime_x:yyyymmdd_to_tuple(Date)),
+        datetime_x:tuple_to_yyyymmdd(calendar:gregorian_days_to_date(Day-Days));
+      false->
+        errortime
+  end.
 
 %%dec_days函数测试
 dec_days_test()->
   ?assertEqual(<<"20161130">>,dec_days(<<"20161231">>,31)), %% 年末 月末
   ?assertEqual(<<"20161227">>,dec_days(<<"20170101">>,5)), %% 元旦 月初
   ?assertEqual(<<"20170218">>,dec_days(<<"20170228">>,10)),  %% 闰月 月末
+  ?assertEqual(errortime,dec_days(<<"20170229">>,10)),  %% 闰月 29日
   ok
 .
