@@ -415,8 +415,8 @@ nextday_test()->
   ?assertEqual({date_mmdd,<<"0301">>},nextday({date_mmdd,<<"0228">>})), %% 闰月 月末
   ?assertEqual({date_internal,{2017,03,01}},nextday({date_internal,{2017,02,28}})), %% 闰月 月末
 
-  ?assertError(_,nextday({date_yyyymmdd,<<"20170229">>})), %% 闰月 29日
-  ?assertError(_,nextday({date_internal,{2017,02,29}})), %% 闰月 29日
+  ?assertError(if_clause,nextday({date_yyyymmdd,<<"20170229">>})), %% 闰月 29日
+  ?assertError(if_clause,nextday({date_internal,{2017,02,29}})), %% 闰月 29日
   ok.
 
 
@@ -452,9 +452,9 @@ inc_days_test()->
   ?assertEqual({date_mmdd,<<"0310">>},inc_days({date_mmdd,<<"0228">>},10)), %% 闰月 月末
   ?assertEqual({date_internal,{2017,03,10}},inc_days({date_internal,{2017,02,28}},10)), %% 闰月 月末
 
-  ?assertError(_,inc_days({date_yyyymmdd,<<"20170229">>},10)),  %% 闰月 29日
-  ?assertError(_,inc_days({date_mmdd,<<"0229">>},10)),  %% 闰月 29日
-  ?assertError(_,inc_days({date_internal,{2017,02,29}},10)),  %% 闰月 29日
+  ?assertError(if_clause,inc_days({date_yyyymmdd,<<"20170229">>},10)),  %% 闰月 29日
+  ?assertError(if_clause,inc_days({date_mmdd,<<"0229">>},10)),  %% 闰月 29日
+  ?assertError(if_clause,inc_days({date_internal,{2017,02,29}},10)),  %% 闰月 29日
   ok.
 
 
@@ -490,9 +490,9 @@ dec_days_test()->
   ?assertEqual({date_mmdd,<<"0218">>},dec_days({date_mmdd,<<"0228">>},10)), %% 闰月 月末
   ?assertEqual({date_internal,{2017,02,18}},dec_days({date_internal,{2017,02,28}},10)), %% 闰月 月末
 
-  ?assertError(_,inc_days({date_yyyymmdd,<<"20170229">>},10)),  %% 闰月 29日
-  ?assertError(_,inc_days({date_mmdd,<<"0229">>},10)),  %% 闰月 29日
-  ?assertError(_,inc_days({date_internal,{2017,02,29}},10)),  %% 闰月 29日
+  ?assertError(if_clause,inc_days({date_yyyymmdd,<<"20170229">>},10)),  %% 闰月 29日
+  ?assertError(if_clause,inc_days({date_mmdd,<<"0229">>},10)),  %% 闰月 29日
+  ?assertError(if_clause,inc_days({date_internal,{2017,02,29}},10)),  %% 闰月 29日
   ok.
 
 %%比较两天的大小
